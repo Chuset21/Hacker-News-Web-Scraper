@@ -24,11 +24,23 @@ def pretty_string_of_hacker_news_list(hacker_news_list: list[dict]) -> str:
         hacker_news_list).replace(',', '\n').replace('[', '').replace(']', '').replace('{', '\n').replace('}', '')
 
 
+class B:
+    BASE_LINK = 'https://news.ycombinator.com/news?p='
+
+
+def get_soup(n: int) -> BeautifulSoup:
+    return BeautifulSoup(requests.get(f'{B.BASE_LINK}{n}').text, 'html.parser')
+
+
 def main():
-    response = requests.get('https://news.ycombinator.com/news')
-    soup = BeautifulSoup(response.text, 'html.parser')
-    links = soup.select('.storylink')
-    subtext = soup.select('.subtext')
+    first_soup = get_soup(1)
+    links = first_soup.select('.storylink')
+    subtext = first_soup.select('.subtext')
+
+    for i in range(2, 6):
+        soup = get_soup(i)
+        links += soup.select('.storylink')
+        subtext += soup.select('.subtext')
 
     print(pretty_string_of_hacker_news_list(create_custom_hacker_news(links, subtext)))
 
